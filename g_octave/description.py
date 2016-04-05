@@ -46,14 +46,14 @@ log = Log('g_octave.description')
 re_depends = re.compile(r'^([a-zA-Z0-9-]+) *(\( *([><=]?=?) *([0-9.]+) *\))?')
 
 # we'll use atoms like 'control-1.0.11' to g-octave packages
-re_pkg_atom = re.compile(r'^(.+)-([0-9.]+)$') 
+re_pkg_atom = re.compile(r'^(.+)-([0-9.]+)$')
 
 class Description(object):
 
     def __init__(self, file, conf=None, parse_sysreq=True):
-        
+
         log.info('Parsing file: %s' % file)
-        
+
         if conf is None:
             conf = Config()
         self._config = conf
@@ -128,7 +128,7 @@ class Description(object):
 
         # add the 'self_depends' key
         self._desc['self_depends'] = list()
-        
+
         # add the 'gentoo_license' key
         self._desc['license_gentoo'] = ''
 
@@ -144,7 +144,7 @@ class Description(object):
             # requirements
             if key in ('systemrequirements', 'buildrequires') and parse_sysreq:
                 self._desc[key] = self._parse_depends(self._desc[key])
-            
+
             # license
             if key == 'license':
                 try:
@@ -268,9 +268,9 @@ class Description(object):
 
 
 class HgDescription(Description):
-    
+
     _url = 'http://sf.net/p/octave'
-    
+
     def __init__(self, category, package):
         temp_desc = config_file = tempfile.mkstemp()[1]
         desc_url = '%s/%s/ci/default/tree/DESCRIPTION?format=raw' % (
@@ -278,9 +278,7 @@ class HgDescription(Description):
             package,
         )
         try:
-            with closing(urllib.urlopen(desc_url)) as fp:
-                with open(temp_desc, 'wb') as fp_:
-                    shutil.copyfileobj(fp, fp_)
+            urllib.urlretrieve(desc_url, temp_desc)
         except:
             raise DescriptionException('Failed to fetch DESCRIPTION file from HG')
         Description.__init__(self, temp_desc, parse_sysreq=True)
